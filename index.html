@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>단위 변환기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .converter-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        button {
+            width: 100%;
+            background-color: #007BFF;
+            color: white;
+            padding: 15px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            font-size: 1.5em;
+            text-align: center;
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="converter-container">
+        <h1>단위 변환기</h1>
+
+        <div class="input-section">
+            <label for="unit-type">단위 유형 선택:</label>
+            <select id="unit-type" onchange="changeUnits()">
+                <option value="length">길이</option>
+                <option value="temperature">온도</option>
+                <option value="area">면적</option>
+            </select>
+        </div>
+
+        <div class="input-section">
+            <label for="from-unit">변환 전 단위:</label>
+            <select id="from-unit"></select>
+        </div>
+
+        <div class="input-section">
+            <label for="to-unit">변환 후 단위:</label>
+            <select id="to-unit"></select>
+        </div>
+
+        <div class="input-section">
+            <label for="value">값 입력:</label>
+            <input type="number" id="value" placeholder="값 입력">
+        </div>
+
+        <button onclick="convert()">변환하기</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const units = {
+            length: {
+                "미터": 1,
+                "센티미터": 100,
+                "밀리미터": 1000,
+                "마이크로미터": 1e6,
+                "나노미터": 1e9,
+                "피트": 3.28084,
+                "인치": 39.3701
+            },
+            temperature: {
+                "섭씨": "celsius",
+                "화씨": "fahrenheit",
+                "켈빈": "kelvin"
+            },
+            area: {
+                "제곱미터": 1,
+                "제곱센티미터": 10000,
+                "제곱밀리미터": 1e6,
+                "제곱피트": 10.7639,
+                "제곱인치": 1550
+            }
+        };
+
+        function changeUnits() {
+            const unitType = document.getElementById("unit-type").value;
+            const fromUnit = document.getElementById("from-unit");
+            const toUnit = document.getElementById("to-unit");
+
+            fromUnit.innerHTML = "";
+            toUnit.innerHTML = "";
+
+            for (const unit in units[unitType]) {
+                const optionFrom = document.createElement("option");
+                const optionTo = document.createElement("option");
+                optionFrom.value = unit;
+                optionTo.value = unit;
+                optionFrom.text = unit;
+                optionTo.text = unit;
+                fromUnit.appendChild(optionFrom);
+                toUnit.appendChild(optionTo);
+            }
+        }
+
+        function convert() {
+            const unitType = document.getElementById("unit-type").value;
+            const fromUnit = document.getElementById("from-unit").value;
+            const toUnit = document.getElementById("to-unit").value;
+            const value = parseFloat(document.getElementById("value").value);
+            let result = 0;
+
+            if (unitType === "length" || unitType === "area") {
+                result = value * (units[unitType][toUnit] / units[unitType][fromUnit]);
+            } else if (unitType === "temperature") {
+                if (fromUnit === "섭씨" && toUnit === "화씨") {
+                    result = (value * 9/5) + 32;
+                } else if (fromUnit === "화씨" && toUnit === "섭씨") {
+                    result = (value - 32) * 5/9;
+                } else if (fromUnit === "섭씨" && toUnit === "켈빈") {
+                    result = value + 273.15;
+                } else if (fromUnit === "켈빈" && toUnit === "섭씨") {
+                    result = value - 273.15;
+                } else if (fromUnit === "화씨" && toUnit === "켈빈") {
+                    result = (value - 32) * 5/9 + 273.15;
+                } else if (fromUnit === "켈빈" && toUnit === "화씨") {
+                    result = (value - 273.15) * 9/5 + 32;
+                }
+            }
+
+            document.getElementById("result").innerText = `결과: ${result.toFixed(2)} ${toUnit}`;
+        }
+
+        // 초기화
+        changeUnits();
+    </script>
+</body>
+</html>
